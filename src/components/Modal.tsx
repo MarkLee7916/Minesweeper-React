@@ -31,11 +31,11 @@ export const Modal = ({ isVisible, hide }: Props) => {
             <h1 className="modal-heading">Controls</h1>
             <p className="modal-subheading"><strong>Revealing a tile:</strong></p>
             <p className="modal-text">PC: left click the tile with your mouse</p>
-            <p className="modal-text">Mobile: Tap the tile on the screen</p>
+            <p className="modal-text">Mobile: Tap the tile on the screen when "Placing: Reveal" is selected</p>
 
             <p className="modal-subheading"><strong>Placing/Unplacing a flag:</strong></p>
             <p className="modal-text">PC: right click the tile with your mouse</p>
-            <p className="modal-text">Mobile: not supported yet</p>
+            <p className="modal-text">Mobile: Tap the tile on the screen when "Placing: Flag 🚩" is selected</p>
 
             <button className="finish-tutorial" onClick={hide}>Close Tutorial</button>
             <button className="prev-page" onClick={prevPage}>Prev</button>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffectAfterInitialisation } from "../hooks/useEffectAfterInitialisation";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
-import { computeCountForGridItem, computeNeighbours, Coord, DEFAULT_BOMB_PROBABILITY, initialseGridWith, initBombGridWith as initBombGrid, NOT_DISCOVERED } from "../models/grid"
+import { computeCountForGridItem, computeNeighbours, Coord, DEFAULT_BOMB_PROBABILITY, initialseGridWith, initBombGridWith, NOT_DISCOVERED } from "../models/grid"
 import { HashSet } from "../utility/hashset";
 import { deepCopy } from "../utility/utils";
 import { Grid } from "./Grid";
@@ -27,6 +27,9 @@ export const Game = () => {
     // True when user has hit a bomb, otherwise false
     const [isGameOver, setGameOver] = useLocalStorageState(false, "gameover");
 
+    // True if a left click reveals a tile, false if it places a flag
+    const [isLeftClickRevealing, setLeftClickToRevealing] = useState(true);
+
     // Whenever user modifies bomb probability, reset bomb grid
     useEffectAfterInitialisation(() =>
         setBombGrid(initialseGridWith(null))
@@ -35,7 +38,7 @@ export const Game = () => {
     // Reveal the frontier values at some coordinate, ends game if coordinate has a bomb
     function revealTileAt({ row, col }: Coord) {
         if (!hasBombGridBeenInitialised()) {
-            const newBombGrid = initBombGrid(bombProbability, { row, col });
+            const newBombGrid = initBombGridWith(bombProbability, { row, col });
 
             setBombGrid(newBombGrid);
             revealNeighbouringTiles({ row, col }, newBombGrid, frontierGrid, new HashSet<Coord>());
@@ -44,6 +47,10 @@ export const Game = () => {
         } else if (!flagGrid[row][col] && frontierGrid[row][col] === NOT_DISCOVERED && !isGameOver) {
             revealNeighbouringTiles({ row, col }, bombGrid, frontierGrid, new HashSet<Coord>());
         }
+    }
+
+    function switchPlacementType() {
+        setLeftClickToRevealing(!isLeftClickRevealing);
     }
 
     function hasBombGridBeenInitialised() {
@@ -127,6 +134,14 @@ export const Game = () => {
         setBombGrid(initialseGridWith(null));
     }
 
+    function handleLeftClick(coord: Coord) {
+        if (isLeftClickRevealing) {
+            revealTileAt(coord);
+        } else {
+            toggleFlagAt(coord);
+        }
+    }
+
     return (
         <>
             <div id="page" style={{ opacity: isModalVisible ? "0.3" : "1" }}>
@@ -135,13 +150,15 @@ export const Game = () => {
                     bombProbability={bombProbability}
                     reset={resetGame}
                     showModal={() => setModalVisibility(true)}
+                    isLeftClickRevealing={isLeftClickRevealing}
+                    switchPlacementType={switchPlacementType}
                 />
                 <Grid
                     isGameOver={isGameOver}
                     bombGrid={bombGrid}
                     flagGrid={flagGrid}
                     frontierGrid={frontierGrid}
-                    leftClickCallback={revealTileAt}
+                    leftClickCallback={handleLeftClick}
                     rightClickCallback={toggleFlagAt}
                 />
             </div>

@@ -1,13 +1,17 @@
-import React from "react"
+import React, { useState } from "react"
+import Switch from "react-switch"
+import { isTouchscreen } from "../utility/utils";
 
 interface Props {
     showModal: () => void
     changeBombProbability: (probabilityStr: string) => void
     bombProbability: number
     reset: () => void
+    isLeftClickRevealing: boolean
+    switchPlacementType: () => void
 }
 
-export const Menu = ({ showModal, changeBombProbability, bombProbability, reset }: Props) => {
+export const Menu = ({ showModal, changeBombProbability, bombProbability, reset, isLeftClickRevealing, switchPlacementType }: Props) => {
     function handleChangeInBombProbability(event) {
         changeBombProbability(event.target.value);
     }
@@ -39,6 +43,16 @@ export const Menu = ({ showModal, changeBombProbability, bombProbability, reset 
                 <button onClick={resizeGrid}>Resize Grid</button>
 
                 <button onClick={showModal}>Tutorial</button>
+
+                <label id="switch-container" style={{ display: isTouchscreen ? "flex" : "none" }}>
+                    <span>Placing: {isLeftClickRevealing ? "Reveal" : "Flag 🚩"} </span>
+                    <Switch
+                        onChange={switchPlacementType}
+                        checked={isLeftClickRevealing}
+                        uncheckedIcon={false}
+                        checkedIcon={false}
+                    />
+                </label>
             </div>
         </>
     )
